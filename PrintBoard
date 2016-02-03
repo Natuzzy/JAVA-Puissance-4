@@ -10,11 +10,6 @@ public class PrintBoard extends GraphicsProgram {
 	private Logic logic = new Logic();
 	private GOval[][] grille = new GOval[Config.LIGNES][Config.COLONNES];
 	
-	public static void main(String[] args){
-    	new PrintBoard().start();
-    	
-    }
-	
 	public void init(){
 		logic.init(boardState, this);
 		grille[0][0] = new GOval(20,20,20,20);
