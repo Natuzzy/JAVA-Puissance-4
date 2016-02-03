@@ -1,0 +1,33 @@
+import java.awt.Color;
+
+import acm.graphics.GOval;
+import acm.program.GraphicsProgram;
+
+
+public class PrintBoard extends GraphicsProgram {
+
+	private BoardState boardState = new BoardState();
+	private Logic logic = new Logic();
+	private GOval[][] grille = new GOval[Config.LIGNES][Config.COLONNES];
+	
+	public static void main(String[] args){
+    	new PrintBoard().start();
+    	
+    }
+	
+	public void init(){
+		logic.init(boardState, this);
+		grille[0][0] = new GOval(20,20,20,20);
+		grille[0][0].addMouseListener(new MouseListenerJeton(logic, 0));
+		add(grille[0][0]);
+	}
+	
+	public void update() {
+		// TODO Auto-generated method stub
+		int ligne = boardState.obtenirLaLigne();
+		int colonne = boardState.obtenirLaColonne();
+		Color couleur = boardState.obtenirCouleurJeton();
+		grille[ligne][colonne].setFillColor(couleur);
+	}
+
+}
