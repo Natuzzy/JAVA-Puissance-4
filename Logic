@@ -1,0 +1,173 @@
+import java.awt.* ;
+import acm.*;
+import acm.program.ConsoleProgram;
+
+public class Logic{
+	
+	private int[][] grille = new int[Config.LIGNES+4][Config.COLONNES+4];
+	private int vide = 0;
+	private int rouge = 1;
+	private int jaune = 2;
+	private int conteur = 1;
+	private int joueurActuelle;
+	private BoardState boardState;
+	private PrintBoard printBoard;
+	
+	public void init(BoardState boardState, PrintBoard printBoard){
+		joueurActuelle = 2;
+		this.boardState = boardState;
+		this.printBoard = printBoard;
+		setJeton(0);
+	}
+	
+	public void setJeton(int colonne){
+
+		int ligne = Config.LIGNES-1;
+		//grille = new int[Config.COLONNES][Config.LIGNES];
+		// Colonne pleine ?
+		if(grille[5][colonne] == vide){
+			//quelle est la case vide ou mettre le jeton ?
+			while(grille[ligne][colonne] != vide && ligne != 0){
+				ligne--;
+			}
+			
+			//remplire la case :
+			boardState.definirLaCase(ligne, colonne);
+			check();
+		}
+		else{
+			check();
+		}
+	}
+	
+	public void check(){
+				
+		//Vérification par colonne
+		for(int i = 0; i < Config.COLONNES; i++){
+			for(int j = 0; j < Config.LIGNES; j++){
+				if(grille[j][i] == grille[j+1][i] && grille[j][i] != vide){
+					conteur++;
+					System.out.println("conteur = "+conteur);
+					if(checkVictoire() == true){
+						victoire(grille[j][i]);
+					}
+				}
+				else{
+					conteur = 1;
+				}
+			}
+		}
+		conteur = 1;
+		//Vérification par ligne
+		for(int i = 0; i < Config.LIGNES; i++){
+			for(int j = 0; j < Config.COLONNES; j++){
+				if(grille[i][j] == grille[i][j+1] && grille[i][j] != vide){
+					conteur++;
+					System.out.println("conteur = "+conteur);
+					if(checkVictoire() == true){
+						victoire(grille[i][j]);
+					}
+				}
+				else{
+					conteur = 1;
+				}
+			}
+		}
+		conteur = 1;
+		//Vérification en diagonal vers le bas
+		for(int i = 0; i < Config.COLONNES-3; i++){
+			for(int j = 3; j < Config.LIGNES; j++){
+				int x = i;
+				int y = j;
+				for(int k = 1; k < 4 ; k++){
+					if(grille[y][x] == grille[y-1][x+1] && grille[y][x] != vide){
+						conteur++;
+						System.out.println("conteur = "+conteur);
+						if(checkVictoire() == true){
+							victoire(grille[i][j]);
+						}
+					}
+					else{
+						conteur = 1;
+					}
+					x++;
+					y--;
+				}
+			}
+		}
+		
+		//Vérification diagonal vers le haut
+		for(int i = 0; i < Config.COLONNES-3; i++){
+			for(int j = 0; j < Config.LIGNES-3; j++){
+				int x = i;
+				int y = j;
+				for(int k = 1; k < 5 ; k++){
+					if(grille[y][x] == grille[y+1][x+1] && grille[y][x] != vide){
+						conteur++;
+						System.out.println("conteur = "+conteur);
+						if(checkVictoire() == true){
+							victoire(grille[i][j]);
+						}
+					}
+					else{
+						conteur = 1;
+					}
+					x++;
+					y++;
+				}
+				
+			}
+		}
+		//Définition du joueur qui va jouer
+		if(joueurActuelle == 2){
+			joueurActuelle = 1;
+		}
+		else{
+			joueurActuelle = 2;
+		}
+		
+		//Est-ce que la grille est rempli ?
+		int colonnesPleines = 0;
+		for(int i = 0; i < Config.COLONNES; i++){
+			if(grille[6][i] != vide){
+				colonnesPleines++;
+			}
+			else{
+				System.out.println("Le jeu n'est pas fini");
+				break;
+			}
+		}
+		if(colonnesPleines == 7){
+			finDuGame();
+			System.out.println("Le jeu est fini");
+		}
+		System.out.println("Le jeu n'est pas fini");
+		printBoard.update();
+	}		
+	
+	public boolean checkVictoire(){
+		boolean reponse;
+		if(conteur == 4){
+			reponse = true;
+		}
+		else{
+			reponse = false;
+		}
+		return reponse;
+	}
+	
+	public void victoire(int i){
+		String vainqueur;
+		if(i == 1){
+			vainqueur = "joueur rouge";
+		}
+		else{
+			vainqueur = "joueur jaune";
+		}
+		System.out.println("Le vainqueur est le "+vainqueur);
+	}
+	
+	public void finDuGame(){
+		
+	}
+}
