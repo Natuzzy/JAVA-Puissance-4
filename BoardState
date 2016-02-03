@@ -1,0 +1,35 @@
+import java.awt.Color;
+
+
+public class BoardState {
+
+	private Color jeton = Color.yellow;
+	private int ligne;
+	private int colonne;
+	
+	public Color obtenirCouleurJeton(){
+		return jeton;
+	}
+	
+	public void definirCouleurJeton(int i){
+		if(i == 1){
+			jeton = Color.red;
+		}
+		else{
+			jeton = Color.yellow;
+		}
+	}
+	
+	public void definirLaCase(int ligne, int colonne) {
+		ligne = this.ligne;
+		colonne = this.colonne;
+	}
+
+	public int obtenirLaLigne(){
+		return ligne;
+	}
+	
+	public int obtenirLaColonne(){
+		return colonne;
+	}
+}
