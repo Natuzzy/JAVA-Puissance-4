@@ -17,15 +17,15 @@ public class Logic{
 		joueurActuelle = 2;
 		this.boardState = boardState;
 		this.printBoard = printBoard;
-		setJeton(0);
+		Color t = boardState.obtenirCouleurJeton();
+		System.out.println("test"+t);
 	}
 	
 	public void setJeton(int colonne){
 
 		int ligne = Config.LIGNES-1;
-		//grille = new int[Config.COLONNES][Config.LIGNES];
 		// Colonne pleine ?
-		if(grille[5][colonne] == vide){
+		if(grille[Config.LIGNES-1][colonne] == vide){
 			//quelle est la case vide ou mettre le jeton ?
 			while(grille[ligne][colonne] != vide && ligne != 0){
 				ligne--;
@@ -33,9 +33,6 @@ public class Logic{
 			
 			//remplire la case :
 			boardState.definirLaCase(ligne, colonne);
-			check();
-		}
-		else{
 			check();
 		}
 	}
