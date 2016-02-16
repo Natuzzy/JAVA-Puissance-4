@@ -1,20 +1,21 @@
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-
 public class MouseListenerJeton implements MouseListener {
 
-	private Logic logic = new Logic();
-	private int i;
+	private Logic logic;
+	private int x;
+	private int y;
 	
-	public MouseListenerJeton(Logic logic, int i){
-		logic = this.logic;
-		i = this.i;
+	public MouseListenerJeton(Logic logic, int y, int x){
+		this.logic = logic;
+		this.x = x;
+		this.y = y;
 	}
 	
 	public void mouseClicked(MouseEvent arg0) {
-		logic.setJeton(0);
-
+		System.out.println("ligne : "+y+" colonne : "+x);
+		this.logic.setJeton(this.y, this.x);
 	}
 
 	public void mouseEntered(MouseEvent arg0) {
