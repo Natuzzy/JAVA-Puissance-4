@@ -1,0 +1,9 @@
+import java.awt.*;
+
+public class Config {
+
+	final static int NB_COLONNES = 7;
+	final static int NB_LIGNES = 6;
+	final static Color J1 = Color.yellow;
+	final static Color J2 = Color.red;
+}
