@@ -1,6 +1,9 @@
 import java.awt.Color;
 
+import acm.graphics.GLabel;
 import acm.graphics.GOval;
+import acm.graphics.GRect;
+import acm.io.IODialog;
 import acm.program.GraphicsProgram;
 
 
@@ -8,21 +11,60 @@ public class PrintBoard extends GraphicsProgram {
 
 	private BoardState boardState = new BoardState();
 	private Logic logic = new Logic();
-	private GOval[][] grille = new GOval[Config.LIGNES][Config.COLONNES];
+	private GOval[][] grille = new GOval[Config.NB_LIGNES][Config.NB_COLONNES];
+	private GRect[] cadre = new GRect[Config.NB_COLONNES];
+	
 	
 	public void init(){
+		System.out.println("te");
+		boardState = new BoardState();
+		logic = new Logic();
 		logic.init(boardState, this);
-		grille[0][0] = new GOval(20,20,20,20);
-		grille[0][0].addMouseListener(new MouseListenerJeton(logic, 0));
-		add(grille[0][0]);
+		removeAll();
+		plateau();
 	}
 	
+	public void plateau(){
+		
+		double hauteur = getHeight();
+		double largeur = getWidth();
+		for(int x = 0; x < Config.NB_COLONNES; x++){
+			int j = Config.NB_LIGNES-1;
+			for(int y = 0; y < Config.NB_LIGNES; y++){
+				grille[y][x] = new GOval(largeur*x/9,hauteur*j/9,largeur/10,hauteur/10);
+				grille[y][x].setFilled(true);
+				grille[y][x].setFillColor(Color.white);
+				grille[y][x].addMouseListener(new MouseListenerJeton(logic, y, x));
+				add(grille[y][x]);
+				j--;
+			}
+		}
+	}
 	public void update() {
-		// TODO Auto-generated method stub
-		int ligne = boardState.obtenirLaLigne();
-		int colonne = boardState.obtenirLaColonne();
-		Color couleur = boardState.obtenirCouleurJeton();
-		grille[ligne][colonne].setFillColor(couleur);
+		for(int i = 0; i < Config.NB_COLONNES; i++){
+			for(int j = 0; j < Config.NB_LIGNES; j++){
+				grille[j][i].setFillColor(boardState.obtenirCase(j, i)); 
+			}
+		}
+	}
+
+	public void finDuJeu() {
+		
+		IODialog io = getDialog();
+		
+		if(boardState.obtenirJActuelle() == Config.J1){
+			io.println("Le vainqueur est le joueur 1");
+		}
+		else{
+			io.println("Le vainqueur est le joueur 2");
+		}
+		init();
+	}
+
+	public void sansGagnant() {
+		IODialog io = getDialog();
+		
+		io.println("Il n'y a pas de gagnant");
 	}
 
 }
