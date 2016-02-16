@@ -1,170 +1,137 @@
 import java.awt.* ;
+
 import acm.*;
 import acm.program.ConsoleProgram;
 
 public class Logic{
 	
-	private int[][] grille = new int[Config.LIGNES+4][Config.COLONNES+4];
-	private int vide = 0;
-	private int rouge = 1;
-	private int jaune = 2;
-	private int conteur = 1;
-	private int joueurActuelle;
+	private Color vide = Color.white;
 	private BoardState boardState;
 	private PrintBoard printBoard;
 	
 	public void init(BoardState boardState, PrintBoard printBoard){
-		joueurActuelle = 2;
 		this.boardState = boardState;
 		this.printBoard = printBoard;
-		Color t = boardState.obtenirCouleurJeton();
-		System.out.println("test"+t);
 	}
 	
-	public void setJeton(int colonne){
+	public void setJeton(int y, int x){
 
-		int ligne = Config.LIGNES-1;
+		int ligne = Config.NB_LIGNES-1;
+
 		// Colonne pleine ?
-		if(grille[Config.LIGNES-1][colonne] == vide){
+		if(boardState.obtenirCase(ligne, x) == vide){
+			ligne = 0;
 			//quelle est la case vide ou mettre le jeton ?
-			while(grille[ligne][colonne] != vide && ligne != 0){
-				ligne--;
+			for(int i = 0; i < Config.NB_LIGNES; i++){
+				if(boardState.obtenirCase(i, x) != vide){
+					ligne++;
+				}
+				else{
+					break;
+				}
 			}
-			
+
 			//remplire la case :
-			boardState.definirLaCase(ligne, colonne);
-			check();
+			boardState.definirLaCase(ligne, x);
+			printBoard.update();
+			check(ligne, x);
 		}
 	}
 	
-	public void check(){
-				
-		//Vérification par colonne
-		for(int i = 0; i < Config.COLONNES; i++){
-			for(int j = 0; j < Config.LIGNES; j++){
-				if(grille[j][i] == grille[j+1][i] && grille[j][i] != vide){
-					conteur++;
-					System.out.println("conteur = "+conteur);
-					if(checkVictoire() == true){
-						victoire(grille[j][i]);
-					}
+	public int compte(int ligne, int colonne, int dirL, int dirC){
+		int compteur = 0;
+		int x = colonne;
+		int y = ligne;
+		while(boardState.obtenirCase(ligne, colonne) == boardState.obtenirCase(y+dirL, x+dirC) && x < Config.NB_COLONNES && y < Config.NB_LIGNES && boardState.obtenirCase(ligne, colonne) != vide){
+				compteur++;
+				x = x + dirC;
+				y = y + dirL;
+				if(compteur == 3){
+					break;
 				}
-				else{
-					conteur = 1;
-				}
+		}
+		return compteur;
+	}
+	
+	public void check(int y, int x){
+			
+		 																			//COLONNE
+		if(y > 2){																					
+			System.out.println("COLONNE");
+			if(compte(y, x, -1, 0) >= 3){
+				printBoard.finDuJeu();
 			}
 		}
-		conteur = 1;
-		//Vérification par ligne
-		for(int i = 0; i < Config.LIGNES; i++){
-			for(int j = 0; j < Config.COLONNES; j++){
-				if(grille[i][j] == grille[i][j+1] && grille[i][j] != vide){
-					conteur++;
-					System.out.println("conteur = "+conteur);
-					if(checkVictoire() == true){
-						victoire(grille[i][j]);
-					}
-				}
-				else{
-					conteur = 1;
-				}
-			}
-		}
-		conteur = 1;
-		//Vérification en diagonal vers le bas
-		for(int i = 0; i < Config.COLONNES-3; i++){
-			for(int j = 3; j < Config.LIGNES; j++){
-				int x = i;
-				int y = j;
-				for(int k = 1; k < 4 ; k++){
-					if(grille[y][x] == grille[y-1][x+1] && grille[y][x] != vide){
-						conteur++;
-						System.out.println("conteur = "+conteur);
-						if(checkVictoire() == true){
-							victoire(grille[i][j]);
-						}
-					}
-					else{
-						conteur = 1;
-					}
-					x++;
-					y--;
+		
+																					//LIGNE
+		for(int i = 0; i < Config.NB_COLONNES-3; i++){												
+			if(boardState.obtenirCase(y, i) == boardState.obtenirJActuelle()){
+				if(compte(y, i, 0, +1) >= 3){
+					printBoard.finDuJeu();
+					break;
 				}
 			}
 		}
 		
-		//Vérification diagonal vers le haut
-		for(int i = 0; i < Config.COLONNES-3; i++){
-			for(int j = 0; j < Config.LIGNES-3; j++){
-				int x = i;
-				int y = j;
-				for(int k = 1; k < 5 ; k++){
-					if(grille[y][x] == grille[y+1][x+1] && grille[y][x] != vide){
-						conteur++;
-						System.out.println("conteur = "+conteur);
-						if(checkVictoire() == true){
-							victoire(grille[i][j]);
-						}
-					}
-					else{
-						conteur = 1;
-					}
-					x++;
-					y++;
-				}
-				
+																					//DIAGONALES HAUT 										
+		int newX = x-y;
+		int newY = y-x;
+		if(newX < 0){
+			newX = 0;
+		}
+		if(newY < 0){
+			newY = 0;
+		}
+
+		while(newX < Config.NB_COLONNES-3 && newY < Config.NB_LIGNES-3){
+			if(compte(newY, newX, 1, 1) >= 3){
+				printBoard.finDuJeu();
 			}
+			newX++;
+			newY++;
 		}
-		//Définition du joueur qui va jouer
-		if(joueurActuelle == 2){
-			joueurActuelle = 1;
+		
+																					//DIAGONALES BAS
+		
+		newX = x+y;
+		newY = y-Config.NB_COLONNES+1+x;
+		if(newX > Config.NB_COLONNES-1){
+			newX = Config.NB_COLONNES-1;
 		}
-		else{
-			joueurActuelle = 2;
+		if(newY < 0){
+			newY = 0;
+		}
+
+		while(newX > 2 && newY < Config.NB_LIGNES-3){
+			if(compte(newY, newX, 1, -1) >= 3){
+				printBoard.finDuJeu();
+			}
+			newX--;
+			newY++;
 		}
 		
 		//Est-ce que la grille est rempli ?
 		int colonnesPleines = 0;
-		for(int i = 0; i < Config.COLONNES; i++){
-			if(grille[6][i] != vide){
-				colonnesPleines++;
-			}
-			else{
-				System.out.println("Le jeu n'est pas fini");
+		int colonne = 0;
+		while(boardState.obtenirCase(Config.NB_LIGNES-1, colonne) != vide){
+			colonnesPleines++;
+			colonne++;
+			System.out.println("ColonnePleines = "+colonnesPleines);
+			if(colonne >= Config.NB_COLONNES){
 				break;
 			}
 		}
-		if(colonnesPleines == 7){
-			finDuGame();
-			System.out.println("Le jeu est fini");
+		if(colonnesPleines == Config.NB_COLONNES){
+			printBoard.sansGagnant();
 		}
-		System.out.println("Le jeu n'est pas fini");
-		printBoard.update();
+		
+		//Définition du joueur actuelle
+		if(boardState.obtenirJActuelle() == Color.yellow){
+			boardState.definirJActuelle(Color.red);
+		}
+		else{
+			boardState.definirJActuelle(Color.yellow);
+		}
 	}		
 	
-	public boolean checkVictoire(){
-		boolean reponse;
-		if(conteur == 4){
-			reponse = true;
-		}
-		else{
-			reponse = false;
-		}
-		return reponse;
-	}
-	
-	public void victoire(int i){
-		String vainqueur;
-		if(i == 1){
-			vainqueur = "joueur rouge";
-		}
-		else{
-			vainqueur = "joueur jaune";
-		}
-		System.out.println("Le vainqueur est le "+vainqueur);
-	}
-	
-	public void finDuGame(){
-		
-	}
 }
