@@ -39,9 +39,11 @@ public class Logic{
 	}
 	
 	public int compte(int ligne, int colonne, int dirL, int dirC){
+		
 		int compteur = 0;
 		int x = colonne;
 		int y = ligne;
+		
 		while(boardState.obtenirCase(ligne, colonne) == boardState.obtenirCase(y+dirL, x+dirC) && x < Config.NB_COLONNES && y < Config.NB_LIGNES && boardState.obtenirCase(ligne, colonne) != vide){
 				compteur++;
 				x = x + dirC;
@@ -50,6 +52,7 @@ public class Logic{
 					break;
 				}
 		}
+		
 		return compteur;
 	}
 	
@@ -57,7 +60,6 @@ public class Logic{
 			
 		 																			//COLONNE
 		if(y > 2){																					
-			System.out.println("COLONNE");
 			if(compte(y, x, -1, 0) >= 3){
 				printBoard.finDuJeu();
 			}
@@ -116,7 +118,6 @@ public class Logic{
 		while(boardState.obtenirCase(Config.NB_LIGNES-1, colonne) != vide){
 			colonnesPleines++;
 			colonne++;
-			System.out.println("ColonnePleines = "+colonnesPleines);
 			if(colonne >= Config.NB_COLONNES){
 				break;
 			}
@@ -132,6 +133,7 @@ public class Logic{
 		else{
 			boardState.definirJActuelle(Color.yellow);
 		}
+		printBoard.update();
 	}		
 	
 }
