@@ -12,19 +12,59 @@ public class PrintBoard extends GraphicsProgram {
 	private BoardState boardState = new BoardState();
 	private Logic logic = new Logic();
 	private GOval[][] grille = new GOval[Config.NB_LIGNES][Config.NB_COLONNES];
-	private GRect[] cadre = new GRect[Config.NB_COLONNES];
-	
+	private String joueur1;
+	private String joueur2;
+	private GRect couleurActuelle;
+	private GLabel jActuelle;
 	
 	public void init(){
-		System.out.println("te");
+
+		removeAll();
+		menu();
+
+	}
+	
+	public void menu(){
+		double hauteur = getHeight();
+		double largeur = getWidth();
+		
+		GLabel puissance4 = new GLabel("PUISSANCE 4", largeur/2-largeur/4, hauteur/9);
+		puissance4.setFont("Comic Sans MS-60");
+		puissance4.setColor(Color.RED);
+		add(puissance4);
+		
+		GRect jouer = new GRect(largeur/2-largeur/4, hauteur/5, largeur/2, hauteur/5);
+		jouer.setFilled(true);
+		jouer.setFillColor(Color.green);
+		jouer.addMouseListener(new MouseListenerJouer(this));
+		add(jouer);
+		
+		GRect quitter = new GRect(largeur/2-largeur/4, hauteur*2.5/5, largeur/2, hauteur/5);
+		quitter.setFilled(true);
+		quitter.setFillColor(Color.red);
+		quitter.addMouseListener(new MouseListenerQuitter());
+		add(quitter);
+		
+		GLabel labelQuitter = new GLabel("Quitter", largeur/2-largeur/4+quitter.getWidth()/3, hauteur*2.5/5+quitter.getHeight()/2);
+		labelQuitter.setFont("Comic Sans MS-40");
+		add(labelQuitter);
+		
+		GLabel labelJouer = new GLabel("Jouer", largeur/2-largeur/4+jouer.getWidth()/3, hauteur*1.1/5+quitter.getHeight()/2);
+		labelJouer.setFont("Comic Sans MS-40");
+		add(labelJouer);
+	}
+	
+	
+	public void plateau(){
+		
+		removeAll();
+		
+		IODialog io = getDialog();
+		joueur1 = io.readLine("Entrez le nom du joueur 1 (jaune)");
+		joueur2 = io.readLine("Entrez le nom du joueur 2 (rouge)");
 		boardState = new BoardState();
 		logic = new Logic();
 		logic.init(boardState, this);
-		removeAll();
-		plateau();
-	}
-	
-	public void plateau(){
 		
 		double hauteur = getHeight();
 		double largeur = getWidth();
@@ -39,12 +79,31 @@ public class PrintBoard extends GraphicsProgram {
 				j--;
 			}
 		}
+		
+		couleurActuelle = new GRect(largeur*7/9,hauteur*1/9, largeur/10,hauteur/10);
+		couleurActuelle.setFilled(true);
+		couleurActuelle.setFillColor(boardState.obtenirJActuelle());
+		add(couleurActuelle);
+		
+		jActuelle = new GLabel(joueur1, largeur*7/9, hauteur*2/9);
+		add(jActuelle);
+		
 	}
 	public void update() {
+		
 		for(int i = 0; i < Config.NB_COLONNES; i++){
 			for(int j = 0; j < Config.NB_LIGNES; j++){
 				grille[j][i].setFillColor(boardState.obtenirCase(j, i)); 
 			}
+		}
+		
+		couleurActuelle.setFillColor(boardState.obtenirJActuelle());
+		
+		if(boardState.obtenirJActuelle() == Config.J1){
+			jActuelle.setLabel(joueur1);
+		}
+		else{
+			jActuelle.setLabel(joueur2);
 		}
 	}
 
@@ -53,12 +112,13 @@ public class PrintBoard extends GraphicsProgram {
 		IODialog io = getDialog();
 		
 		if(boardState.obtenirJActuelle() == Config.J1){
-			io.println("Le vainqueur est le joueur 1");
+			io.println("Le vainqueur est "+joueur1);
 		}
 		else{
-			io.println("Le vainqueur est le joueur 2");
+			io.println("Le vainqueur est "+joueur2);
 		}
-		init();
+		
+		init(); //Relancement du jeu
 	}
 
 	public void sansGagnant() {
